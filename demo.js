@@ -22,6 +22,9 @@ redis.on("ready", function() {
     console.log("Connection is ready to go" + "\n");
 });
 
+
+var cors = require('cors');
+app.use(cors());
 /**
  * Use xlsx module to convert excel to jsonData then feed data to database
  */
@@ -53,6 +56,7 @@ function insertExcelData(){
     }
 }
 
+
 // check for if there is any update, delete, or insert data to the database,
 // if false, we can get the data form the cache obj for saving time to search in the database
 // if true, the we must go get the datas from the database.
@@ -69,6 +73,7 @@ app.get('/*', function(req, res) {
 
     if (path === '/') {
         // example link : http://localhost:8081/
+        insertExcelData();
         res.send("Hello, world!");
 
     } else if (path === '/get_all') {
@@ -85,7 +90,7 @@ app.get('/*', function(req, res) {
         // example link : http://localhost:8081/insert?id=value&jsonData={}  
         // id value is the insert key, and jsonData is the insert value in json obj
         // it will insert as a hash set into database
-        id = id + 1;
+        id = req.query.id
         insertData(req, res, id, JSON.parse(query.jsonData));
 
     } else if (path === '/get_by_id_suffix_like') {
@@ -206,7 +211,7 @@ async function insertData(req, res, id, jsonData) {
 
     await redis.hset(id, jsonData, function(err, result) {
         if (err) { // if insert has err occurs
-            console.log(err); 
+            console.log("This error: "+err); 
             throw err;
         } else {
             isCurd = true;
