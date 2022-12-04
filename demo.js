@@ -216,7 +216,7 @@ async function insertData(req, res, id, jsonData) {
         } else {
             isCurd = true;
             console.log(result);
-            res.send("add successfully: \n" + result);
+            res.send({"add successfully": result});
         } 
     });
 }
